@@ -2,10 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "virtualMachines_backend_name": {
-            "defaultValue": "backend",
-            "type": "String"
-        },
         "virtualMachines_SQLSVR1_name": {
             "defaultValue": "SQLSVR1",
             "type": "String"
@@ -13,17 +9,9 @@
         "virtualMachines_frontend1_name": {
             "defaultValue": "frontend1",
             "type": "String"
-        },    
+        },
         "virtualMachines_frontend2_name": {
             "defaultValue": "frontend2",
-            "type": "String"
-        },
-        "loadBalancers_frenchpress_name": {
-            "defaultValue": "frenchpress",
-            "type": "String"
-        },
-        "networkInterfaces_backend_name": {
-            "defaultValue": "backend",
             "type": "String"
         },
         "networkInterfaces_SQLSVR1_name": {
@@ -61,7 +49,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkSecurityGroups_canttouchthis_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "properties": {
                 "securityRules": []
             }
@@ -70,7 +58,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkSecurityGroups_coffeesecure_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "properties": {
                 "securityRules": [
                     {
@@ -97,7 +85,7 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "name": "[parameters('publicIPAddresses_frenchpress_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "sku": {
                 "name": "Standard",
                 "tier": "Regional"
@@ -114,7 +102,7 @@
                 "idleTimeoutInMinutes": 4,
                 "dnsSettings": {
                     "domainNameLabel": "robinco",
-                    "fqdn": "robinco.[resourceGroup().location].cloudapp.azure.com"
+                    "fqdn": "robinco.eastus.cloudapp.azure.com"
                 },
                 "ipTags": []
             }
@@ -123,7 +111,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetworks_coffeenet_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "tags": {
                 "Owner": "robin.notte@gmail.com",
                 "costcenter": "1988",
@@ -183,64 +171,8 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
-            "name": "[parameters('virtualMachines_backend_name')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_backend_name'))]"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "Standard_B1s"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "Canonical",
-                        "offer": "UbuntuServer",
-                        "sku": "16.04-LTS",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "osType": "Linux",
-                        "name": "[concat(parameters('virtualMachines_backend_name'), '_OsDisk_1_f9846e95f91c426c94ea94e9c45ac824')]",
-                        "createOption": "FromImage",
-                        "caching": "ReadWrite",
-                        "managedDisk": {
-                            "storageAccountType": "Premium_LRS"
-                        
-                        },
-                        "diskSizeGB": 30
-                    },
-                    "dataDisks": []
-                },
-                "osProfile": {
-                    "computerName": "[parameters('virtualMachines_backend_name')]",
-                 
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": false,
-                        "provisionVMAgent": true,
-                        "patchSettings": {
-                            "patchMode": "ImageDefault",
-                            "assessmentMode": "ImageDefault"
-                        }
-                    },
-                    "secrets": [],
-                    "allowExtensionOperations": true,
-                    "requireGuestProvisionSignal": true
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_frontend1_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontend1VMNic_name'))]"
             ],
@@ -262,6 +194,7 @@
                         "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "Premium_LRS"
+                    
                         },
                         "diskSizeGB": 30
                     },
@@ -286,7 +219,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                 
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontend1VMNic_name'))]"
                         }
                     ]
                 }
@@ -296,7 +229,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_frontend2_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontend2VMNic_name'))]"
             ],
@@ -325,7 +258,7 @@
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_frontend2_name')]",
-                     "adminUsername": "robinhood215",
+                         "adminUsername": "robinhood215",
                     "adminPassword": "testPass",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
@@ -342,7 +275,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                          
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontend2VMNic_name'))]"
                         }
                     ]
                 }
@@ -352,7 +285,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "name": "[parameters('virtualMachines_SQLSVR1_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQLSVR1_name'))]"
             ],
@@ -382,7 +315,7 @@
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_SQLSVR1_name')]",
-                      "adminUsername": "robinhood215",
+                         "adminUsername": "robinhood215",
                     "adminPassword": "testPass",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
@@ -399,30 +332,10 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                      
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_SQLSVR1_name'))]"
                         }
                     ]
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Network/loadBalancers/backendAddressPools",
-            "apiVersion": "2020-11-01",
-            "name": "[concat(parameters('loadBalancers_frenchpress_name'), '/thepool')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_frenchpress_name'))]"
-            ],
-            "properties": {
-                "loadBalancerBackendAddresses": [
-                    {
-                        "name": "beardco_frontend2VMNicipconfigfrontend2",
-                        "properties": {}
-                    },
-                    {
-                        "name": "beardco_frontend1VMNicipconfigfrontend1",
-                        "properties": {}
-                    }
-                ]
             }
         },
         {
@@ -506,25 +419,24 @@
                 "privateLinkServiceNetworkPolicies": "Enabled"
             }
         },
-        ,
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
-            "name": "[parameters('networkInterfaces_backend_name')]",
-            "location": "[resourceGroup().location]",
+            "name": "[parameters('networkInterfaces_frontend1VMNic_name')]",
+            "location": "eastus",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'backend')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_canttouchthis_name'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "[parameters('networkInterfaces_backend_name')]",
+                        "name": "ipconfigfrontend1",
                         "properties": {
-                            "privateIPAddress": "10.0.2.4",
+                            "privateIPAddress": "10.0.1.5",
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                              
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]"
                             },
                             "primary": true,
                             "privateIPAddressVersion": "IPv4"
@@ -537,7 +449,41 @@
                 "enableAcceleratedNetworking": false,
                 "enableIPForwarding": false,
                 "networkSecurityGroup": {
-                  
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('networkInterfaces_frontend2VMNic_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfigfrontend2",
+                        "properties": {
+                            "privateIPAddress": "10.0.1.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
                 }
             }
         },
@@ -545,7 +491,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_SQLSVR1_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'data')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_canttouchthis_name'))]"
@@ -558,7 +504,7 @@
                             "privateIPAddress": "10.0.3.4",
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                              
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'data')]"
                             },
                             "primary": true,
                             "privateIPAddressVersion": "IPv4"
@@ -571,87 +517,7 @@
                 "enableAcceleratedNetworking": false,
                 "enableIPForwarding": false,
                 "networkSecurityGroup": {
-                    
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-11-01",
-            "name": "[parameters('networkInterfaces_frontend1VMNic_name')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]",
-                "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancers_frenchpress_name'), 'thepool')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfigfrontend1",
-                        "properties": {
-                            "privateIPAddress": "10.0.1.5",
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                               
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4",
-                            "loadBalancerBackendAddressPools": [
-                                {
-                                  
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "dnsSettings": {
-                    "dnsServers": []
-                },
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "networkSecurityGroup": {
-                  
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-11-01",
-            "name": "[parameters('networkInterfaces_frontend2VMNic_name')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_coffeenet_name'), 'frontend')]",
-                "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancers_frenchpress_name'), 'thepool')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_coffeesecure_name'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfigfrontend2",
-                        "properties": {
-                            "privateIPAddress": "10.0.1.4",
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                             
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4",
-                            "loadBalancerBackendAddressPools": [
-                                {
-                                 
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "dnsSettings": {
-                    "dnsServers": []
-                },
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "networkSecurityGroup": {
-                 
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_canttouchthis_name'))]"
                 }
             }
         }
